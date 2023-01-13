@@ -15,43 +15,57 @@ var questionNumber = 0; //which question to display
 
 //global variable objects from HTML
 var timer; //onscreen time element
-var timeLeft;
+var seconds = 0;
 var startScreen = document.querySelector('#start-screen');
 var qScreen = document.querySelector('#questions');
 
-start.addEventListener("click",startGame());
+start.addEventListener("click", startGame);
 
 //initialise function to reset all variables
 function init() {
     runningScore = 0;
     result = "";
-    gameTime = 10100;
+    gameTime = 62000;
     questionNumber = 0;
 
     timer = document.querySelector('#timer');
     startScreen = document.querySelector('#start-screen');
     qScreen = document.querySelector('#questions');
 
+    //initialise html elements for questions
     questionsInit();
-
-    timerFunc(gameTime); //set timer up
-    
+    //set game timer
+    gameTimerFunc(gameTime, document.querySelector('#time')); //set timer up
     //hide start screen
-    toggleReveal(startScreen,"start");
+    toggleReveal(startScreen, "start");
     //show questions screen
-    toggleReveal(qScreen,"questions");
+    toggleReveal(qScreen, "questions");
     return;
 }
 
 //start the game funtion
 function startGame() {
     init(); //reset variables
-    questionsPop();
-    //while loop to iterate questions until complete or timeout
-    // while (timeLeft > 0 && questionNumber < 21) {
-    //     questionsPop();
-    // }
+    runGame();
+    return;
+}
 
+//the game engine
+function runGame() {
+    questionsPop();
+    choices.addEventListener("click", function(event) {
+        var elementBtn = event.target;
+        if (elementBtn.tagName === 'BUTTON') {
+            if (elementBtn.textContent === questionList[questionNumber].ans) {
+                questionNumber++;
+                runningScore++;
+                questionsPop();
+            } else {
+                questionNumber++;
+                questionsPop();
+            }
+        }
+    });
     return;
 }
 
@@ -116,30 +130,30 @@ function checkAnswer() {
     return;
 }
 
-//timer function
-function timerFunc() {
-    timer = document.querySelector('#time');
+//Game timer function
+function gameTimerFunc(length, element) {
+    timer = element;
+    var countDownDate = new Date(Date.now() + length);
 
-    var countDownDate = new Date(Date.now() + 101000);
-
-    countDown = setInterval(function() {
+    gameCountDown = setInterval(function() {
         // Get today's date and time
         var now = new Date().getTime();
         // Find the distance between now and the count down date
-        timeLeft = countDownDate - now;
+        var timeLeft = countDownDate - now;
         // Time calculations for days, hours, minutes and seconds
-        var seconds = Math.floor(distance/1000);
+        var seconds = Math.floor(timeLeft/1000);
         // Output the result in an element
         timer.textContent = seconds;
         // If the count down is over, end the game
         if (timeLeft < 0) {
-            clearInterval(countDown);
+            clearInterval(gameCountDown);
             timer.textContent = "EXPIRED";
-            // gameComplete = "lose";
             // alert("You have lost!");
             // totalLosses++;
             // screenLosses.textContent = totalLosses;
         }
     }, 1000);
+
     return;
 }
+
