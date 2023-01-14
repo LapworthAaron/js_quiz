@@ -18,6 +18,7 @@ var timer; //onscreen time element
 var seconds = 0;
 var startScreen = document.querySelector('#start-screen');
 var qScreen = document.querySelector('#questions');
+var endScreen = document.querySelector('#end-screen');
 
 start.addEventListener("click", startGame);
 
@@ -54,17 +55,7 @@ function startGame() {
 function runGame() {
     questionsPop();
     choices.addEventListener("click", function(event) {
-        var elementBtn = event.target;
-        if (elementBtn.tagName === 'BUTTON') {
-            if (elementBtn.textContent === questionList[questionNumber].ans) {
-                questionNumber++;
-                runningScore++;
-                questionsPop();
-            } else {
-                questionNumber++;
-                questionsPop();
-            }
-        }
+        checkAnswer(event.target);
     });
     return;
 }
@@ -112,22 +103,47 @@ function questionsInit() {
 
 function questionsPop() {
     //populate the buttons and question field with the appropriate text
-    var qTitle = document.querySelector('#question-title');
-    var q1= document.querySelector('#quest1');
-    var q2 = document.querySelector('#quest2');
-    var q3 = document.querySelector('#quest3');
-    var q4 = document.querySelector('#quest4');
-    populateText(qTitle, questionList[questionNumber].question);
-    populateText(q1, questionList[questionNumber].opt1);
-    populateText(q2, questionList[questionNumber].opt2);
-    populateText(q3, questionList[questionNumber].opt3);
-    populateText(q4, questionList[questionNumber].opt4);
+    if (questionNumber < questionList.length) {
+        var qTitle = document.querySelector('#question-title');
+        var q1= document.querySelector('#quest1');
+        var q2 = document.querySelector('#quest2');
+        var q3 = document.querySelector('#quest3');
+        var q4 = document.querySelector('#quest4');
+        populateText(qTitle, questionList[questionNumber].question);
+        populateText(q1, questionList[questionNumber].opt1);
+        populateText(q2, questionList[questionNumber].opt2);
+        populateText(q3, questionList[questionNumber].opt3);
+        populateText(q4, questionList[questionNumber].opt4);
+    } else {
+        //hide questions screen
+        toggleReveal(qScreen, "questions");
+        //show end screen
+        toggleReveal(endScreen, "end-screen");
+
+        gameOver();
+    }
+    
     return;
 }
 
 //check answer
-function checkAnswer() {
+function checkAnswer(elementObj) {
+    if (elementObj.textContent === questionList[questionNumber].ans) {
+        questionNumber++;
+        runningScore++;
+        questionsPop();
+    } else {
+        questionNumber++;
+        questionsPop();
+    }
     return;
+}
+
+//once game is over
+function gameOver() {
+    var endScore = document.querySelector('#final-score');
+    console.log(runningScore);
+    populateText(endScore, runningScore);
 }
 
 //Game timer function
