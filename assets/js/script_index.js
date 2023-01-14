@@ -119,7 +119,7 @@ function questionsPop() {
         toggleReveal(qScreen, "questions");
         //show end screen
         toggleReveal(endScreen, "end-screen");
-
+        clearInterval(gameCountDown);
         gameOver();
     }
     
@@ -142,15 +142,31 @@ function checkAnswer(elementObj) {
 //once game is over
 function gameOver() {
     var endScore = document.querySelector('#final-score');
-    console.log(runningScore);
-    populateText(endScore, runningScore);
+    populateText(endScore, runningScore);    
+
 }
+
+//submit score 
+submit.addEventListener("click", function() {
+    var initialsInput = document.querySelector("#initials");
+    if (initialsInput.value === null) {
+        alert("please enter initials");
+    } else {
+        addHighScore(runningScore, initialsInput.value)
+    }
+    //hide end screen
+    toggleReveal(endScreen, "end-screen");
+    //show start screen
+    toggleReveal(startScreen, "start");
+    initialsInput.value = "";
+    timer.textContent = "0"
+});
 
 //Game timer function
 function gameTimerFunc(length, element) {
     timer = element;
     var countDownDate = new Date(Date.now() + length);
-
+    timer.textContent = ((length-1000)/1000);
     gameCountDown = setInterval(function() {
         // Get today's date and time
         var now = new Date().getTime();
