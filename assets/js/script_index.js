@@ -60,6 +60,9 @@ function startGame() {
 function runGame() {
     questionsPop();
     choices.addEventListener("click", function(event) {
+        console.log(event);
+        console.log(event.target);
+        console.log(event.target.tagName);
         checkAnswer(event.target);
     });
     return;
@@ -90,19 +93,12 @@ function questionsInit() {
     //create the list and buttons
     var divQ = document.querySelector('.choices');
     var olQ = document.createElement('ol');
-    var b1 = document.createElement('button');
-    var b2 = document.createElement('button');
-    var b3 = document.createElement('button');
-    var b4 = document.createElement('button');
     divQ.appendChild(olQ);
-    olQ.appendChild(b1);
-    olQ.appendChild(b2);
-    olQ.appendChild(b3);
-    olQ.appendChild(b4);
-    b1.setAttribute('id', 'quest1');
-    b2.setAttribute('id', 'quest2');
-    b3.setAttribute('id', 'quest3');
-    b4.setAttribute('id', 'quest4');
+    for (var i = 1; i < 5; i++) {
+        var btn = document.createElement('button');
+        olQ.appendChild(btn);
+        btn.setAttribute('id', 'quest' + i);
+    }
     return;
 }
 
@@ -127,31 +123,33 @@ function questionsPop() {
 
 //check answer
 function checkAnswer(elementObj) {
-    var feedback = document.getElementById("feedback");
-    if (elementObj.textContent === questionList[questionNumber].ans) {
-        audioCorrect.play();
-        questionNumber++;
-        runningScore++;
-        questionsPop();
-        toggleReveal(feedback, "feedback");
-        feedback.textContent = "Correct!";
-        setTimeout(function(){
-            feedback.textContent = "";
+    if (elementObj.tagName === 'BUTTON') {
+        var feedback = document.getElementById("feedback");
+        if (elementObj.textContent === questionList[questionNumber].ans) {
+            audioCorrect.play();
+            questionNumber++;
+            runningScore++;
+            questionsPop();
             toggleReveal(feedback, "feedback");
-            }, 400);
-    } else {
-        audioIncorrect.play();
-        questionNumber++;
-        clearInterval(gameCountDown);
-        gameTime = Math.round((gameTime - (Date.now() - previousDate.getTime()) - 1000)/1000)*1000;
-        gameTimerFunc(gameTime, document.querySelector('#time'));
-        toggleReveal(feedback, "feedback");
-        feedback.textContent = "Wrong!";
-        setTimeout(function(){
-            feedback.textContent = "";
+            feedback.textContent = "Correct!";
+            setTimeout(function(){
+                feedback.textContent = "";
+                toggleReveal(feedback, "feedback");
+                }, 400);
+        } else {
+            audioIncorrect.play();
+            questionNumber++;
+            clearInterval(gameCountDown);
+            gameTime = Math.round((gameTime - (Date.now() - previousDate.getTime()) - 1000)/1000)*1000;
+            gameTimerFunc(gameTime, document.querySelector('#time'));
             toggleReveal(feedback, "feedback");
-            }, 400);
-        questionsPop();
+            feedback.textContent = "Wrong!";
+            setTimeout(function(){
+                feedback.textContent = "";
+                toggleReveal(feedback, "feedback");
+                }, 400);
+            questionsPop();
+        }
     }
     return;
 }
