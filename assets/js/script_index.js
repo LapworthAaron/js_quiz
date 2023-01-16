@@ -122,7 +122,6 @@ function questionsPop() {
     } else {
         gameOver();
     }
-    
     return;
 }
 
@@ -139,41 +138,34 @@ function checkAnswer(elementObj) {
         setTimeout(function(){
             feedback.textContent = "";
             toggleReveal(feedback, "feedback");
-            },1000);
+            }, 400);
     } else {
         audioIncorrect.play();
         questionNumber++;
-        questionsPop();
         clearInterval(gameCountDown);
-        console.log(gameTime);
-        // gameTime = new Date(gameTime - (previousDate - Date.now()));
         gameTime = Math.round((gameTime - (Date.now() - previousDate.getTime()) - 1000)/1000)*1000;
-        console.log(previousDate);
-        console.log(Date(Date.now()));
-        console.log(gameTime);
-        // console.log(Date(length - (previousDate - Date.now())));
         gameTimerFunc(gameTime, document.querySelector('#time'));
         toggleReveal(feedback, "feedback");
         feedback.textContent = "Wrong!";
         setTimeout(function(){
             feedback.textContent = "";
             toggleReveal(feedback, "feedback");
-            },1000);
+            }, 400);
+        questionsPop();
     }
     return;
 }
 
 //once game is over
 function gameOver() {
+    clearInterval(gameCountDown);
+    timer.textContent = "0";
     //hide questions screen
     toggleReveal(qScreen, "questions");
     //show end screen
     toggleReveal(endScreen, "end-screen");
-    clearInterval(gameCountDown);
     var endScore = document.querySelector('#final-score');
-    populateText(endScore, runningScore);    
-    
-
+    populateText(endScore, runningScore);  
 }
 
 //submit score 
@@ -189,7 +181,6 @@ submit.addEventListener("click", function() {
     //show start screen
     toggleReveal(startScreen, "start");
     initialsInput.value = "";
-    timer.textContent = "0";
 });
 
 //Game timer function
@@ -208,13 +199,12 @@ function gameTimerFunc(length, element) {
         // Output the result in an element
         timer.textContent = seconds;
         // If the count down is over, end the game
-        if (timeLeft < 0) {
-            clearInterval(gameCountDown);
+        if (timeLeft <= 0) {
             timer.textContent = "EXPIRED";
             gameOver();
         }
     }, 1000);
-
+    // console.log(gameCountDown);
     return;
 }
 
