@@ -60,9 +60,6 @@ function startGame() {
 function runGame() {
     questionsPop();
     choices.addEventListener("click", function(event) {
-        console.log(event);
-        console.log(event.target);
-        console.log(event.target.tagName);
         checkAnswer(event.target);
     });
     return;
