@@ -19,6 +19,11 @@ var seconds = 0;
 var startScreen = document.querySelector('#start-screen');
 var qScreen = document.querySelector('#questions');
 var endScreen = document.querySelector('#end-screen');
+var gameCountDown = 0;
+var previousDate = new Date(Date.now());
+
+const audioCorrect = new Audio("./assets/sfx/correct.wav")
+const audioIncorrect = new Audio("./assets/sfx/incorrect.wav")
 
 start.addEventListener("click", startGame);
 
@@ -28,10 +33,10 @@ function init() {
     result = "";
     gameTime = 62000;
     questionNumber = 0;
+    gameCountDown = 0;
+    previousDate = new Date(Date.now());
 
     timer = document.querySelector('#timer');
-    startScreen = document.querySelector('#start-screen');
-    qScreen = document.querySelector('#questions');
 
     //initialise html elements for questions
     questionsInit();
@@ -115,11 +120,6 @@ function questionsPop() {
         populateText(q3, questionList[questionNumber].opt3);
         populateText(q4, questionList[questionNumber].opt4);
     } else {
-        //hide questions screen
-        toggleReveal(qScreen, "questions");
-        //show end screen
-        toggleReveal(endScreen, "end-screen");
-        clearInterval(gameCountDown);
         gameOver();
     }
     
@@ -128,21 +128,51 @@ function questionsPop() {
 
 //check answer
 function checkAnswer(elementObj) {
+    var feedback = document.getElementById("feedback");
     if (elementObj.textContent === questionList[questionNumber].ans) {
+        audioCorrect.play();
         questionNumber++;
         runningScore++;
         questionsPop();
+        toggleReveal(feedback, "feedback");
+        feedback.textContent = "Correct!";
+        setTimeout(function(){
+            feedback.textContent = "";
+            toggleReveal(feedback, "feedback");
+            },1000);
     } else {
+        audioIncorrect.play();
         questionNumber++;
         questionsPop();
+        clearInterval(gameCountDown);
+        console.log(gameTime);
+        // gameTime = new Date(gameTime - (previousDate - Date.now()));
+        gameTime = Math.round((gameTime - (Date.now() - previousDate.getTime()) - 1000)/1000)*1000;
+        console.log(previousDate);
+        console.log(Date(Date.now()));
+        console.log(gameTime);
+        // console.log(Date(length - (previousDate - Date.now())));
+        gameTimerFunc(gameTime, document.querySelector('#time'));
+        toggleReveal(feedback, "feedback");
+        feedback.textContent = "Wrong!";
+        setTimeout(function(){
+            feedback.textContent = "";
+            toggleReveal(feedback, "feedback");
+            },1000);
     }
     return;
 }
 
 //once game is over
 function gameOver() {
+    //hide questions screen
+    toggleReveal(qScreen, "questions");
+    //show end screen
+    toggleReveal(endScreen, "end-screen");
+    clearInterval(gameCountDown);
     var endScore = document.querySelector('#final-score');
     populateText(endScore, runningScore);    
+    
 
 }
 
@@ -159,14 +189,15 @@ submit.addEventListener("click", function() {
     //show start screen
     toggleReveal(startScreen, "start");
     initialsInput.value = "";
-    timer.textContent = "0"
+    timer.textContent = "0";
 });
 
 //Game timer function
 function gameTimerFunc(length, element) {
     timer = element;
+    previousDate = new Date(Date.now());
     var countDownDate = new Date(Date.now() + length);
-    timer.textContent = ((length-1000)/1000);
+    timer.textContent = Math.floor((length-1000)/1000);
     gameCountDown = setInterval(function() {
         // Get today's date and time
         var now = new Date().getTime();
@@ -180,9 +211,7 @@ function gameTimerFunc(length, element) {
         if (timeLeft < 0) {
             clearInterval(gameCountDown);
             timer.textContent = "EXPIRED";
-            // alert("You have lost!");
-            // totalLosses++;
-            // screenLosses.textContent = totalLosses;
+            gameOver();
         }
     }, 1000);
 
