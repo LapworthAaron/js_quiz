@@ -204,7 +204,6 @@ function gameTimerFunc(length, element) {
             gameOver();
         }
     }, 1000);
-    // console.log(gameCountDown);
     return;
 }
 
